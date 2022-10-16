@@ -38,6 +38,7 @@ namespace API.Controllers
             return StatusCode(StatusCodes.Status200OK,employeeDTOs);
         }
 
+        [Authorize(AuthenticationSchemes = "JWTBearer", Roles = "Admin")]
         [HttpPost("AddEmployee",Name = "AddEmployee")]
         public async Task<IActionResult> AddEmployee(EmployeeDTO newEmp)
         {
