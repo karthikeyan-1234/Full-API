@@ -44,7 +44,7 @@ namespace Authenticate.Services
             var jwttoken = new JwtSecurityToken(
                 issuer: _configuration["JWT:ValidIssuer"],
                 audience: _configuration["JWT:ValidAudience"],
-                expires: DateTime.Now.AddSeconds(30),
+                expires: DateTime.Now.AddSeconds(500),
                 claims: authClaims,
                 signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
                 );
@@ -74,7 +74,7 @@ namespace Authenticate.Services
             TokenModel token = new TokenModel
             {
                 Token = ref_token,
-                Expires = DateTime.Now.AddSeconds(60),
+                Expires = DateTime.Now.AddSeconds(600),
                 UserName = user?.UserName,
                 is_expired = false
             };

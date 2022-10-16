@@ -6,5 +6,6 @@ namespace API.Services
     {
         Task<EmployeeDTO> AddEmployeeAsync(EmployeeDTO newEmp);
         Task<IList<EmployeeDTO>> GetAllEmployeesAsync();
+        Task<IList<EmployeeDTO>> GetAllEmployeesWithoutCacheAsync();
     }
 }

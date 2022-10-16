@@ -20,7 +20,7 @@ namespace API.Services
         IHttpContextAccessor accessor;
         string? user;
 
-        public EmployeeService(IGenericRepo<Employee> repo, IMapper mapper, ICacheManager cache, ILogger<EmployeeService> logger,IHttpContextAccessor accessor)
+        public EmployeeService(IGenericRepo<Employee> repo, IMapper mapper, ICacheManager cache, ILogger<EmployeeService> logger, IHttpContextAccessor accessor)
         {
             this.repo = repo;
             this.mapper = mapper;
@@ -39,7 +39,7 @@ namespace API.Services
 
             var emp = await repo.AddAsync(mapper.Map<Employee>(newEmp));
             await repo.SaveChangesAsync();
-            logger.LogInformation("Employee {} added by {}",newEmp.name,user);
+            logger.LogInformation("Employee {} added by {}", newEmp.name, user);
             return mapper.Map<EmployeeDTO>(emp.Entity);
         }
 
@@ -51,11 +51,22 @@ namespace API.Services
 
             if (employees == null)
             {
-                employees = (IList<Employee>) await repo.GetAllAsync();
+                employees = (IList<Employee>)await repo.GetAllAsync();
                 await cache.TrySetAsync("GetAllEmployees", employees);
 
             }
 
+            var emps = (IList<EmployeeDTO>)mapper.Map<IEnumerable<EmployeeDTO>>(employees);
+
+            logger.LogInformation("All employees requested by user {0}", user);
+
+            return emps;
+        }
+
+
+        public async Task<IList<EmployeeDTO>> GetAllEmployeesWithoutCacheAsync()
+        {
+            IList<Employee> employees = (IList<Employee>)await repo.GetAllAsync();
             var emps = (IList<EmployeeDTO>)mapper.Map<IEnumerable<EmployeeDTO>>(employees);
 
             logger.LogInformation("All employees requested by user {0}", user);

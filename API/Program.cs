@@ -1,4 +1,5 @@
 using API.Contexts;
+using API.Infrastructure.BackGroundTasks;
 using API.Infrastructure.Caching;
 using API.Infrastructure.Hubs;
 using API.Infrastructure.Middlewares;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
+using Serilog.Events;
 using System.Security.Claims;
 using System.Text;
 
@@ -18,7 +20,8 @@ var configuration = builder.Configuration;
 
 // Add services to the container.
 
-var logger = new LoggerConfiguration().ReadFrom.Configuration(builder.Configuration).Enrich
+var logger = new LoggerConfiguration().ReadFrom.Configuration(builder.Configuration)
+    .Enrich
     .FromLogContext()
     .CreateLogger();
 builder.Logging.ClearProviders();
@@ -32,6 +35,7 @@ builder.Services.AddScoped(typeof(IGenericRepo<>), typeof(GenericRepo<>));
 builder.Services.AddScoped<ICacheManager, CacheManager>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<ICityService, CityService>();
+builder.Services.AddHostedService<APIBackGroundService>();
 
 builder.Services.AddLocalization(opt => { opt.ResourcesPath = "Resources"; });
 

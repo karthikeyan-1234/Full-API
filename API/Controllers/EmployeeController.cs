@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Primitives;
 
+#pragma warning disable CS8604 // Possible null reference argument.
+
+
 namespace API.Controllers
 {
     [Route("api/[controller]")]
@@ -38,7 +41,7 @@ namespace API.Controllers
             return StatusCode(StatusCodes.Status200OK,employeeDTOs);
         }
 
-        [Authorize(AuthenticationSchemes = "JWTBearer", Roles = "Admin")]
+        [Authorize(AuthenticationSchemes = "JWTBearer", Roles = "User")]
         [HttpPost("AddEmployee",Name = "AddEmployee")]
         public async Task<IActionResult> AddEmployee(EmployeeDTO newEmp)
         {
@@ -47,3 +50,6 @@ namespace API.Controllers
         }
     }
 }
+
+
+#pragma warning restore CS8604 // Possible null reference argument.

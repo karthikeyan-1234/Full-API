@@ -14,7 +14,7 @@ namespace API.Infrastructure.Caching
         public CacheManager(IDistributedCache cache, IHttpContextAccessor accessor)
         {
             this.cache = cache;
-            options = new DistributedCacheEntryOptions() { AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(90), SlidingExpiration = TimeSpan.FromSeconds(30) };
+            options = new DistributedCacheEntryOptions() { AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(20)};
             this.accessor = accessor;
         }
 
@@ -25,7 +25,7 @@ namespace API.Infrastructure.Caching
                 var session = accessor.HttpContext?.Session;
                 var user = session?.GetString("user");
                 string json = JsonSerializer.Serialize(entry);
-                await cache.SetStringAsync(user + "-" + key,json);
+                await cache.SetStringAsync(user + "-" + key,json,options);
                 return true;
             }
             catch (Exception)
