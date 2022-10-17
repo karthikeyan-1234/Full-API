@@ -69,7 +69,7 @@ namespace API.Services
             IList<Employee> employees = (IList<Employee>)await repo.GetAllAsync();
             var emps = (IList<EmployeeDTO>)mapper.Map<IEnumerable<EmployeeDTO>>(employees);
 
-            logger.LogInformation("All employees requested by user {0}", user);
+            logger.LogInformation("All employees requested by Background service");
 
             return emps;
         }
