@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System.Linq.Expressions;
 
 namespace API.Repositories
 {
@@ -10,5 +11,6 @@ namespace API.Repositories
         Task<IEnumerable<T>> GetAllAsync();
         Task<int> SaveChangesAsync();
         void Update(T entry);
+        IEnumerable<T> GetAllWithProperty(Expression<Func<T, object>> includeProperties);
     }
 }

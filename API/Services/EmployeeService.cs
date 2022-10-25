@@ -1,6 +1,7 @@
 ﻿using API.Infrastructure.Caching;
 using API.Models;
 using API.Models.DTOs;
+using API.Models.ViewModels;
 using API.Repositories;
 using AutoMapper;
 using Microsoft.Extensions.Localization;
@@ -14,13 +15,14 @@ namespace API.Services
     public class EmployeeService : IEmployeeService
     {
         IGenericRepo<Employee> repo;
+        ICityService cityService;
         IMapper mapper;
         ICacheManager cache;
         ILogger<EmployeeService> logger;
         IHttpContextAccessor accessor;
         string? user;
 
-        public EmployeeService(IGenericRepo<Employee> repo, IMapper mapper, ICacheManager cache, ILogger<EmployeeService> logger, IHttpContextAccessor accessor)
+        public EmployeeService(IGenericRepo<Employee> repo, IMapper mapper, ICacheManager cache, ILogger<EmployeeService> logger, IHttpContextAccessor accessor, ICityService cityService)
         {
             this.repo = repo;
             this.mapper = mapper;
@@ -29,6 +31,7 @@ namespace API.Services
             this.accessor = accessor;
             var session = accessor?.HttpContext?.Session;
             user = session?.GetString("user");
+            this.cityService = cityService;
         }
 
         public async Task<EmployeeDTO> AddEmployeeAsync(EmployeeDTO newEmp)
@@ -43,20 +46,21 @@ namespace API.Services
             return mapper.Map<EmployeeDTO>(emp.Entity);
         }
 
-        public async Task<IList<EmployeeDTO>> GetAllEmployeesAsync()
+        public async Task<IList<EmployeeViewModel>> GetAllEmployeesAsync()
         {
 
 
             IList<Employee> employees = await cache?.TryGetAsync<IList<Employee>>("GetAllEmployees");
 
+
             if (employees == null)
             {
-                employees = (IList<Employee>)await repo.GetAllAsync();
+                IEnumerable<Employee> _employees = repo.GetAllWithProperty(e => e.City_obj);
+                employees = (IList<Employee>) mapper.Map<IEnumerable<Employee>>(_employees);
                 await cache.TrySetAsync("GetAllEmployees", employees);
-
             }
 
-            var emps = (IList<EmployeeDTO>)mapper.Map<IEnumerable<EmployeeDTO>>(employees);
+            var emps = (IList<EmployeeViewModel>)mapper.Map<IEnumerable<EmployeeViewModel>>(employees);
 
             logger.LogInformation("All employees requested by user {0}", user);
 

@@ -1,6 +1,7 @@
 ﻿using API.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System.Linq.Expressions;
 
 namespace API.Repositories
 {
@@ -21,5 +22,10 @@ namespace API.Repositories
         public async Task<int> SaveChangesAsync() => await db.SaveChangesAsync();
         public async Task<IEnumerable<T>> GetAllAsync() => await table.ToListAsync();
         public IEnumerable<T> Find(Func<T, bool> where) => table.Where(where).ToList();
+
+        public IEnumerable<T> GetAllWithProperty(Expression<Func<T, object>> includeProperties)
+        {
+            return table.Include(includeProperties);
+        }
     }
 }

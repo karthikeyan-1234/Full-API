@@ -1,5 +1,6 @@
 ﻿using API.Models;
 using API.Models.DTOs;
+using API.Models.ViewModels;
 using API.Services;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
@@ -27,11 +28,11 @@ namespace API.Controllers
             this.localizer = localizer;
         }
 
-        [Authorize(AuthenticationSchemes = "JWTBearer",Roles = "User")]
+        //[Authorize(AuthenticationSchemes = "JWTBearer",Roles = "User")]
         [HttpGet("GetAllEmployees",Name = "GetAllEmployees")]
         public async Task<IActionResult> GetAllEmployees()
         {
-            IList<EmployeeDTO> employeeDTOs = await service.GetAllEmployeesAsync();
+            IList<EmployeeViewModel> employeeDTOs = await service.GetAllEmployeesAsync();
 
             for (int i = 0; i < employeeDTOs.Count; i++)
             {
@@ -47,6 +48,12 @@ namespace API.Controllers
         {
             var emp = await service.AddEmployeeAsync(newEmp);
             return StatusCode(StatusCodes.Status200OK,emp);
+        }
+
+        [HttpGet("Test",Name = "Test")]
+        public IActionResult GetTest()
+        {
+            return Ok("Test");
         }
     }
 }

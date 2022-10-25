@@ -22,5 +22,10 @@ namespace API.Services
             await repo.SaveChangesAsync();
             return mapper.Map<CityDTO>(city.Entity);
         }
+
+        public CityDTO GetCityByID(int id)
+        {
+            return mapper.Map<CityDTO>(repo.Find(c => c.id == id).First());
+        }
     }
 }
