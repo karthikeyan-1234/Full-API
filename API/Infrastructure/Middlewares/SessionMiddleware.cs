@@ -1,12 +1,8 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using System.Security.Claims;
-using System.Threading.Tasks;
+﻿using System.Security.Claims;
 
 namespace API.Infrastructure.Middlewares
 {
 #pragma warning disable CS8604 // Possible null reference argument.
-    // You may need to install the Microsoft.AspNetCore.Http.Abstractions package into your project
     public class CustomSessionMiddleware
     {
         private readonly RequestDelegate _next;
@@ -25,8 +21,10 @@ namespace API.Infrastructure.Middlewares
                 var user = httpContext.User;
                 var session = httpContext.Session;
                 string? emailid = user.FindFirst(ClaimTypes.Email)?.Value;
+                string? tenantId = user.FindFirst("TenantID")?.Value;
                 session?.SetString("user", emailid);
-                logger.LogInformation("Custom Session Middleware : Adding user {0} to session",emailid);
+                session?.SetString("tenantid", tenantId);
+                logger.LogInformation("Custom Session Middleware : Adding user {0} to session with tenant id {1}",emailid,tenantId);
                 return _next(httpContext);
 
             }

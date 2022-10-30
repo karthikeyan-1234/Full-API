@@ -1,6 +1,8 @@
-﻿namespace API.Models
+﻿using API.Models.Base;
+
+namespace API.Models
 {
-    public class Product
+    public class Product : BaseEntity
     {
         public string? productName { get; set; }
         public string? category { get; set; }

@@ -1,4 +1,5 @@
 using Authenticate.Contexts;
+using Authenticate.Models;
 using Authenticate.Services;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Identity;
@@ -25,7 +26,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ApplicationDBContext>(options => options.UseSqlServer(configuration.GetConnectionString("IdentityConStr")));
 builder.Services.AddDbContext<TokenDBContext>(options => options.UseSqlServer(configuration.GetConnectionString("TokenConStr")));
 
-builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDBContext>()
     .AddDefaultTokenProviders();
 

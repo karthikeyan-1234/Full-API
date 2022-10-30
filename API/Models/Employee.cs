@@ -1,6 +1,8 @@
-﻿namespace API.Models
+﻿using API.Models.Base;
+
+namespace API.Models
 {
-    public class Employee
+    public class Employee : BaseEntity
     {
         public int id { get; set; }
         public string ?name { get; set; }

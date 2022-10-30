@@ -6,12 +6,12 @@ namespace Authenticate.Services
 {
     public class LoginService : ILoginService
     {
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IConfiguration _configuration;
         private readonly ITokenService _tokenService;
 
-        public LoginService(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration, ITokenService tokenService)
+        public LoginService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration, ITokenService tokenService)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -25,7 +25,7 @@ namespace Authenticate.Services
             if (userExists != null)
                 return new ResponseModel { Status = "Error", Message = "User already exists!", Object = userExists, StatusCode = StatusCodes.Status500InternalServerError };
 
-            IdentityUser user = new()
+            ApplicationUser user = new()
             {
                 Email = model.Email,
                 SecurityStamp = Guid.NewGuid().ToString(),
@@ -50,7 +50,7 @@ namespace Authenticate.Services
             if (userExists != null)
                 return new ResponseModel { Status = "Error", Message = "User already exists!", Object = userExists, StatusCode = StatusCodes.Status500InternalServerError };
 
-            IdentityUser user = new()
+            ApplicationUser user = new()
             {
                 Email = model.Email,
                 SecurityStamp = Guid.NewGuid().ToString(),
@@ -76,7 +76,7 @@ namespace Authenticate.Services
             if (userExists != null)
                 return new ResponseModel { Status = "Error", Message = "User already exists!", StatusCode = StatusCodes.Status500InternalServerError };
 
-            IdentityUser user = new()
+            ApplicationUser user = new()
             {
                 Email = model.Email,
                 SecurityStamp = Guid.NewGuid().ToString(),

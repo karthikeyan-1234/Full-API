@@ -1,6 +1,8 @@
-﻿namespace API.Models.ViewModels
+﻿using API.Models.Base;
+
+namespace API.Models.ViewModels
 {
-    public class EmployeeViewModel
+    public class EmployeeViewModel : BaseEntity
     {
         public int id { get; set; }
         public string? name { get; set; }

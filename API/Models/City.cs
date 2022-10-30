@@ -1,6 +1,9 @@
-﻿namespace API.Models
+﻿using API.Models.Base;
+using System.ComponentModel;
+
+namespace API.Models
 {
-    public class City
+    public class City : BaseEntity
     {
         public int id { get; set; }
         public string ?name { get; set; }

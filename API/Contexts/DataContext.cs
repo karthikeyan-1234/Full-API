@@ -7,15 +7,21 @@ namespace API.Contexts
     {
         public DbSet<Employee>? Employees { get; set; }
         public DbSet<City>? Cities { get; set; }
+        IConfiguration configration;
 
-        public DataContext(DbContextOptions<DataContext> options) : base(options)
+        public DataContext(DbContextOptions<DataContext> options,IConfiguration configuration) : base(options)
         {
+            this.configration = configuration;
+        }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseSqlServer(configration.GetConnectionString("DataContext"));
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            var Employees = modelBuilder.Entity<Employee>();
+            var Employees = modelBuilder.Entity<Employee>().HasQueryFilter(e => e.id != 1);
             var Cities = modelBuilder.Entity<City>();
 
             Employees.HasKey(e => e.id);

@@ -15,8 +15,8 @@ namespace Authenticate.Controllers
     [ApiController]
     public class AuthenticateController : ControllerBase
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
 
         private readonly IConfiguration _configuration;
@@ -24,7 +24,7 @@ namespace Authenticate.Controllers
         private readonly ILoginService _loginService;
 
         public AuthenticateController(IConfiguration configuration,ITokenService tokenService, ILoginService loginService,
-            UserManager<IdentityUser> userManager,SignInManager<IdentityUser> signInManager, RoleManager<IdentityRole> roleManager)
+            UserManager<ApplicationUser> userManager,SignInManager<ApplicationUser> signInManager, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _configuration = configuration;

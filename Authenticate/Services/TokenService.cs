@@ -14,17 +14,17 @@ namespace Authenticate.Services
     public class TokenService : ITokenService
     {
         private readonly IConfiguration _configuration;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly TokenDBContext db;
 
-        public TokenService(IConfiguration configuration,UserManager<IdentityUser> userManager,TokenDBContext db)
+        public TokenService(IConfiguration configuration,UserManager<ApplicationUser> userManager,TokenDBContext db)
         {
             _configuration = configuration;
             _userManager = userManager;
             this.db = db;
         }
 
-        public TokenModel GetJWTToken(IList<string> userRoles,IdentityUser user)
+        public TokenModel GetJWTToken(IList<string> userRoles,ApplicationUser user)
         {
 
             var authClaims = new List<Claim>
@@ -32,6 +32,7 @@ namespace Authenticate.Services
                     new Claim(ClaimTypes.Name, user.UserName),
                     new Claim(ClaimTypes.Email, user.Email),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    new Claim("TenantID",user.TenantID)
                 };
 
             foreach (var userRole in userRoles)
@@ -57,7 +58,7 @@ namespace Authenticate.Services
             };
 
         }
-        public TokenModel GetRefreshToken(IdentityUser user)
+        public TokenModel GetRefreshToken(ApplicationUser user)
         {
             var rand_no = new byte[32];
             var rand_gen = RandomNumberGenerator.Create();

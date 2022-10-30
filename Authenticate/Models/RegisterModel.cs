@@ -13,5 +13,8 @@ namespace Authenticate.Models
 
         [Required(ErrorMessage = "Password is required")]
         public string? Password { get; set; }
+
+        [Required(ErrorMessage = "TenantID is required")]
+        public string? TenantID { get; set; }
     }
 }
