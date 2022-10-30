@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Authenticate.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20221030150642_AddTenantID")]
-    partial class AddTenantID
+    [Migration("20221030174226_AddTenantTableRelation")]
+    partial class AddTenantTableRelation
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -70,7 +70,8 @@ namespace Authenticate.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TenantID")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
@@ -89,7 +90,27 @@ namespace Authenticate.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
+                    b.HasIndex("TenantID");
+
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("Authenticate.Models.Tenant", b =>
+                {
+                    b.Property<string>("TenantId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"), 1L, 1);
+
+                    b.HasKey("TenantId");
+
+                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("TenantId"));
+
+                    b.ToTable("Tenants");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -225,6 +246,17 @@ namespace Authenticate.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Authenticate.Models.ApplicationUser", b =>
+                {
+                    b.HasOne("Authenticate.Models.Tenant", "Tenant_obj")
+                        .WithMany("ApplicationUser_Objs")
+                        .HasForeignKey("TenantID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tenant_obj");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -274,6 +306,11 @@ namespace Authenticate.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Authenticate.Models.Tenant", b =>
+                {
+                    b.Navigation("ApplicationUser_Objs");
                 });
 #pragma warning restore 612, 618
         }

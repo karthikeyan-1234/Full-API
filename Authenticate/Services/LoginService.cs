@@ -29,7 +29,8 @@ namespace Authenticate.Services
             {
                 Email = model.Email,
                 SecurityStamp = Guid.NewGuid().ToString(),
-                UserName = model.Username
+                UserName = model.Username,
+                TenantID = model.TenantID
             };
             var result = await _userManager.CreateAsync(user, model.Password); //Can also be created using only User. This is useful while using third party authentication providers
             if (!result.Succeeded)
@@ -54,7 +55,8 @@ namespace Authenticate.Services
             {
                 Email = model.Email,
                 SecurityStamp = Guid.NewGuid().ToString(),
-                UserName = model.Username
+                UserName = model.Username,
+                TenantID = model.TenantID
             };
             var result = await _userManager.CreateAsync(user, model.Password); //Can also be created using only User. This is useful while using third party authentication providers
             if (!result.Succeeded)
@@ -80,7 +82,8 @@ namespace Authenticate.Services
             {
                 Email = model.Email,
                 SecurityStamp = Guid.NewGuid().ToString(),
-                UserName = model.Username
+                UserName = model.Username,
+                TenantID = model.TenantID 
             };
             var result = await _userManager.CreateAsync(user, model.Password);
             if (!result.Succeeded)
@@ -125,7 +128,7 @@ namespace Authenticate.Services
                 return new ResponseModel { Status = "Error", Message = "Unable to find user", StatusCode = StatusCodes.Status404NotFound };
 
 
-            return new ResponseModel { Status = "Success", Message = "Other Errors", StatusCode = StatusCodes.Status200OK };
+            return new ResponseModel { Status = "Success", Message = "User logged in", StatusCode = StatusCodes.Status200OK };
         }
     }
 }

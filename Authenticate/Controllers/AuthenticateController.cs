@@ -22,9 +22,10 @@ namespace Authenticate.Controllers
         private readonly IConfiguration _configuration;
         private readonly ITokenService _tokenService;
         private readonly ILoginService _loginService;
+        private readonly ITenantService _tenantService;
 
         public AuthenticateController(IConfiguration configuration,ITokenService tokenService, ILoginService loginService,
-            UserManager<ApplicationUser> userManager,SignInManager<ApplicationUser> signInManager, RoleManager<IdentityRole> roleManager)
+            UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, RoleManager<IdentityRole> roleManager, ITenantService tenantService)
         {
             _userManager = userManager;
             _configuration = configuration;
@@ -32,6 +33,7 @@ namespace Authenticate.Controllers
             _loginService = loginService;
             _signInManager = signInManager;
             _roleManager = roleManager;
+            _tenantService = tenantService;
         }
 
         [HttpPost]
@@ -123,20 +125,26 @@ namespace Authenticate.Controllers
         [Route("register-admin")]
         public async Task<IActionResult> RegisterAdmin([FromBody] RegisterModel model)
         {
-            var res = await _loginService.RegisterUserAsync(model);
+            var res = await _loginService.RegisterAdminAsync(model);
 
-            if (res?.StatusCode == StatusCodes.Status200OK)
-            {
-                res = await _loginService.RegisterAdminAsync(model);
+            if(res.StatusCode == StatusCodes.Status200OK)
+                return Ok(res);
 
-                if(res.StatusCode == StatusCodes.Status200OK)
-                    return Ok(res);
-            }
-
-            return StatusCode((int)res?.StatusCode,res.Object);
+            return StatusCode((int)res?.StatusCode,res.Message);
         }
 
+        [HttpPost]
+        [Route("register-tenant")]
+        public async Task<IActionResult> RegisterTenant([FromBody] RegisterTenantModel model)
+        {
+            var res = await _tenantService.AddNewTenantAsync(model);
 
+            if (res?.StatusCode == StatusCodes.Status200OK)
+                return Ok(res);
+            else
+                return StatusCode((int)res?.StatusCode, res.Object);
+
+        }
     }
 }
 #pragma warning restore CS8629 // Nullable value type may be null.
