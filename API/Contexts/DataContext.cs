@@ -8,21 +8,27 @@ namespace API.Contexts
         public DbSet<Employee>? Employees { get; set; }
         public DbSet<City>? Cities { get; set; }
         IConfiguration configration;
+        IHttpContextAccessor accessor;
+        string? TenantID;
 
-        public DataContext(DbContextOptions<DataContext> options,IConfiguration configuration) : base(options)
+        public DataContext(DbContextOptions<DataContext> options,IConfiguration configuration, IHttpContextAccessor accessor) : base(options)
         {
             this.configration = configuration;
+            this.accessor = accessor;
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer(configration.GetConnectionString("DataContext"));
+            var session = accessor?.HttpContext?.Session;
+            TenantID = session?.GetString("tenantid");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            var Employees = modelBuilder.Entity<Employee>().HasQueryFilter(e => e.id != 1);
-            var Cities = modelBuilder.Entity<City>();
+            var Employees = modelBuilder.Entity<Employee>().HasQueryFilter(e => e.TenantId == TenantID);
+            var Cities = modelBuilder.Entity<City>().HasQueryFilter(e => e.TenantId == TenantID);
+
 
             Employees.HasKey(e => e.id);
             Employees.Property(e => e.id).UseIdentityColumn(1, 1);

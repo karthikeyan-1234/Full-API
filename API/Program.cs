@@ -35,7 +35,7 @@ builder.Services.AddScoped(typeof(IGenericRepo<>), typeof(GenericRepo<>));
 builder.Services.AddScoped<ICacheManager, CacheManager>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<ICityService, CityService>();
-builder.Services.AddHostedService<APIBackGroundService>();
+//builder.Services.AddHostedService<APIBackGroundService>();
 
 builder.Services.AddLocalization(opt => { opt.ResourcesPath = "Resources"; });
 

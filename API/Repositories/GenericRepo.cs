@@ -25,7 +25,8 @@ namespace API.Repositories
 
         public IEnumerable<T> GetAllWithProperty(Expression<Func<T, object>> includeProperties)
         {
-            return table.Include(includeProperties);
+            var res = table.Include(includeProperties);
+            return res;
         }
     }
 }
