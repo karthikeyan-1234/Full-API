@@ -7,7 +7,7 @@ namespace Authenticate.Contexts
 {
     public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
     {
-        public DbSet<Tenant> Tenants { get; set; }
+        public DbSet<Tenant> ?Tenants { get; set; }
         public ApplicationDBContext(DbContextOptions<ApplicationDBContext> options) : base(options)
         {
 

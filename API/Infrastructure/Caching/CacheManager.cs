@@ -10,12 +10,14 @@ namespace API.Infrastructure.Caching
         IDistributedCache cache;
         IHttpContextAccessor accessor;
         DistributedCacheEntryOptions options;
+        ILogger<CacheManager> logger;
 
-        public CacheManager(IDistributedCache cache, IHttpContextAccessor accessor)
+        public CacheManager(IDistributedCache cache, IHttpContextAccessor accessor, ILogger<CacheManager> logger)
         {
             this.cache = cache;
-            options = new DistributedCacheEntryOptions() { AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(20)};
+            options = new DistributedCacheEntryOptions() { AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(20) };
             this.accessor = accessor;
+            this.logger = logger;
         }
 
         public async Task<bool> TrySetAsync<T>(string key, T entry)
@@ -28,8 +30,9 @@ namespace API.Infrastructure.Caching
                 await cache.SetStringAsync(user + "-" + key,json,options);
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                logger.LogError("Error in getting Redis Cache" + ex.Message);
                 return false;
             }
         }
@@ -47,7 +50,7 @@ namespace API.Infrastructure.Caching
             }
             catch (Exception ex)
             {
-
+                logger.LogError("Error in getting Redis Cache" + ex.Message);
                 return default;
             }
         }

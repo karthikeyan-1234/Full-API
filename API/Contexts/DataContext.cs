@@ -1,8 +1,13 @@
 ﻿using API.Models;
+using API.Models.Base;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
+using System.Linq.Expressions;
 
 namespace API.Contexts
 {
+
     public class DataContext : DbContext, IDataContext
     {
         public DbSet<Employee>? Employees { get; set; }
@@ -26,6 +31,7 @@ namespace API.Contexts
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
             var Employees = modelBuilder.Entity<Employee>().HasQueryFilter(e => e.TenantId == TenantID);
             var Cities = modelBuilder.Entity<City>().HasQueryFilter(e => e.TenantId == TenantID);
 
@@ -38,6 +44,7 @@ namespace API.Contexts
             //Cities.HasIndex(c => c.name).IsClustered(); Only one clustered index allowed per table. This is only for demo purposes
 
             Employees.HasOne(e => e.City_obj).WithMany(c => c.Employee_Objs).HasForeignKey(e => e.city_id);
+
 
             base.OnModelCreating(modelBuilder);
         }

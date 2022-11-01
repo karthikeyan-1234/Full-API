@@ -2,6 +2,7 @@
 using API.Models.DTOs;
 using API.Repositories;
 using AutoMapper;
+using System.Reflection.Metadata.Ecma335;
 
 namespace API.Services
 {
@@ -23,9 +24,8 @@ namespace API.Services
             return mapper.Map<CityDTO>(city.Entity);
         }
 
-        public CityDTO GetCityByID(int id)
-        {
-            return mapper.Map<CityDTO>(repo.Find(c => c.id == id).First());
-        }
+        public CityDTO GetCityByID(int id) => mapper.Map<CityDTO>(repo.Find(c => c.id == id).First());
+
+        public CityDTO GetCityByName(string name) => mapper.Map<CityDTO>(repo.Find(c => c.name == name).First());
     }
 }

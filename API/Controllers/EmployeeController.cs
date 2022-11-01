@@ -40,7 +40,7 @@ namespace API.Controllers
 
         [Authorize(AuthenticationSchemes = "JWTBearer", Roles = "User")]
         [HttpPost("AddEmployee",Name = "AddEmployee")]
-        public async Task<IActionResult> AddEmployee(EmployeeDTO newEmp)
+        public async Task<IActionResult> AddEmployee(EmployeeViewModel newEmp)
         {
             var emp = await service.AddEmployeeAsync(newEmp);
             return StatusCode(StatusCodes.Status200OK,emp);

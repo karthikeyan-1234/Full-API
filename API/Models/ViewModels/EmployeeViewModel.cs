@@ -9,5 +9,6 @@ namespace API.Models.ViewModels
         public float age { get; set; }
         public string? email_id { get; set; }
         public string? city_name { get; set; }
+        public string? TenantId { get; set; }
     }
 }

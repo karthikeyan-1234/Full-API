@@ -34,13 +34,16 @@ namespace API.Services
             this.cityService = cityService;
         }
 
-        public async Task<EmployeeDTO> AddEmployeeAsync(EmployeeDTO newEmp)
+        public async Task<EmployeeDTO> AddEmployeeAsync(EmployeeViewModel nEmp)
         {
-
+            EmployeeDTO newEmp = mapper.Map<EmployeeDTO>(nEmp);
             var session = accessor?.HttpContext?.Session;
             user = session?.GetString("user");
 
-            var emp = await repo.AddAsync(mapper.Map<Employee>(newEmp));
+            var newEm = mapper.Map<Employee>(newEmp);
+            newEm.city_id = cityService.GetCityByName(nEmp?.city_name).id;
+
+            var emp = await repo.AddAsync(newEm);
             await repo.SaveChangesAsync();
             logger.LogInformation("Employee {} added by {}", newEmp.name, user);
             return mapper.Map<EmployeeDTO>(emp.Entity);

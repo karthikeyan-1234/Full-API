@@ -6,5 +6,7 @@ namespace API.Services
     {
         Task<CityDTO> AddCityAsync(CityDTO newCity);
         CityDTO GetCityByID(int id);
+
+        CityDTO GetCityByName(string name);
     }
 }
