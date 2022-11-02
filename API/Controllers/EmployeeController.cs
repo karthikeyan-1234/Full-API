@@ -12,11 +12,11 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = "JWTBearer", Roles = "User")]
     public class EmployeeController : ControllerBase
     {
         private IEmployeeService service;
         IStringLocalizer<EmployeeController> localizer;
-
 
         public EmployeeController(IEmployeeService service,IStringLocalizer<EmployeeController> localizer)
         {
@@ -24,7 +24,6 @@ namespace API.Controllers
             this.localizer = localizer;
         }
 
-        [Authorize(AuthenticationSchemes = "JWTBearer",Roles = "User")]
         [HttpGet("GetAllEmployees",Name = "GetAllEmployees")]
         public async Task<IActionResult> GetAllEmployees()
         {
@@ -37,19 +36,32 @@ namespace API.Controllers
 
             return StatusCode(StatusCodes.Status200OK,employeeDTOs);
         }
+        [HttpGet("GetEmployeeById", Name = "GetEmployeeById")]
+        public IActionResult GetEmployeeById(int id)
+        {
+            var response = service.GetEmployeeById(id);
+            return StatusCode(response.StatusCode, response.Object);
+        }
 
-        [Authorize(AuthenticationSchemes = "JWTBearer", Roles = "User")]
         [HttpPost("AddEmployee",Name = "AddEmployee")]
         public async Task<IActionResult> AddEmployee(EmployeeViewModel newEmp)
         {
-            var emp = await service.AddEmployeeAsync(newEmp);
-            return StatusCode(StatusCodes.Status200OK,emp);
+            var response = await service.AddEmployeeAsync(newEmp);
+            return StatusCode(response.StatusCode,response.Object);
         }
 
-        [HttpGet("Test",Name = "Test")]
-        public IActionResult GetTest()
+        [HttpPut("UpdateEmployee", Name = "UpdateEmployee")]
+        public async Task<IActionResult> UpdateEmployee(EmployeeViewModel newEmp)
         {
-            return Ok("Test");
+            var response = await service.UpdateEmployeeAsync(newEmp);
+            return StatusCode(response.StatusCode, response);
+        }
+
+        [HttpDelete("DeleteEmployee", Name = "DeleteEmployee")]
+        public async Task<IActionResult> DeleteEmployee(EmployeeViewModel newEmp)
+        {
+            var response = await service.DeleteEmployeeAsync(newEmp);
+            return StatusCode(response.StatusCode, response.Status);
         }
     }
 }
