@@ -1,10 +1,12 @@
 using API.Contexts;
 using API.Infrastructure.BackGroundTasks;
 using API.Infrastructure.Caching;
+using API.Infrastructure.Filters;
 using API.Infrastructure.Hubs;
 using API.Infrastructure.Middlewares;
 using API.Repositories;
 using API.Services;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Identity;
@@ -35,6 +37,8 @@ builder.Services.AddScoped(typeof(IGenericRepo<>), typeof(GenericRepo<>));
 builder.Services.AddScoped<ICacheManager, CacheManager>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<ICityService, CityService>();
+builder.Services.AddScoped<CustomSessionFilter>();
+builder.Services.AddMediatR(typeof(Program));
 //builder.Services.AddHostedService<APIBackGroundService>();
 
 builder.Services.AddLocalization(opt => { opt.ResourcesPath = "Resources"; });
