@@ -3,13 +3,11 @@
     public class SessionService : ISessionService
     {
         IHttpContextAccessor accessor;
-        string? user;
 
         public SessionService(IHttpContextAccessor accessor)
         {
             this.accessor = accessor;
             var session = accessor?.HttpContext?.Session;
-            user = session?.GetString("user");
         }
 
         public SessionService() { }

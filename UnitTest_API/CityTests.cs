@@ -85,6 +85,13 @@ namespace UnitTest_API
             Assert.IsType<Task<IList<CityDTO>>>(cities);
         }
 
+        [Fact]
+        void Should_Session_Service_Return_Session_Data()
+        {
+            var mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
+            var context = new DefaultHttpContext();
+        }
+
 
     }
 
