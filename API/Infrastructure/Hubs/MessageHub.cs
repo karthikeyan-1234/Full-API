@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.SignalR;
 
 namespace API.Infrastructure.Hubs
 {
+    //[Authorize(AuthenticationSchemes = "JWTBearer", Roles = "User")]
     public class MessageHub : Hub
     {
         public override Task OnConnectedAsync()

@@ -20,19 +20,18 @@ namespace API.Services
         ICacheManager cache;
         IMapper mapper;
         string? user;
-        IHttpContextAccessor accessor;
+        ISessionService sessionService;
         IMediator mediator;
 
-        public CityService(IGenericRepo<City> repo, IMapper mapper, ILogger<CityService> logger, IHttpContextAccessor accessor,ICacheManager cache,IMediator mediator)
+        public CityService(IGenericRepo<City> repo, IMapper mapper, ILogger<CityService> logger, ICacheManager cache,IMediator mediator,ISessionService sessionService)
         {
             this.repo = repo;
             this.mapper = mapper;
             this.cache = cache;
             this.logger = logger;
             this.mediator = mediator;
-            this.accessor = accessor;
-            var session = accessor?.HttpContext?.Session;
-            user = session?.GetString("user");
+            this.sessionService = sessionService;
+            user = sessionService?.GetString("user");
         }
 
         public async Task<ResponseModel> AddCityAsync(CityDTO newCity)
@@ -41,8 +40,7 @@ namespace API.Services
 
             try
             {
-                var session = accessor?.HttpContext?.Session;
-                user = session?.GetString("user");
+                user = sessionService?.GetString("user");
 
                 var newCi = mapper.Map<City>(newCity);
 
@@ -53,7 +51,7 @@ namespace API.Services
                 response.StatusCode = StatusCodes.Status201Created;
                 response.Status = "Added";
                 response.Message = "City added";
-                response.Object = mapper.Map<CityDTO>(emp.Entity);
+                response.Object = mapper.Map<CityDTO>(emp);
                 return response;
             }
             catch (Exception ex)

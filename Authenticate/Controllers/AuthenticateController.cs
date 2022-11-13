@@ -74,6 +74,49 @@ namespace Authenticate.Controllers
         }
 
         [HttpPost]
+        [Route("validate-tokens")]
+        public async Task<IActionResult> ValidateTokens([FromBody] RefreshTokenRequest req)
+        {
+            string? jwt_token = req?.jwtToken;
+            string? ref_token = req?.refreshToken;
+            string? userName = req?.userName;
+
+            TokenResponseModel tokenResponse = new TokenResponseModel();
+
+            if (_tokenService.IsValidJWT(userName, jwt_token))
+            {
+                var user = await _userManager.FindByNameAsync(req.userName);
+                var userRoles = await _userManager.GetRolesAsync(user);
+
+                tokenResponse = new TokenResponseModel()
+                {
+                    JWTToken = new TokenModel() { Token = req.jwtToken, UserName = req.userName, is_expired = false },
+                    RefreshToken = new TokenModel() { Token = req.refreshToken, UserName = req.userName, is_expired = false }
+                };
+
+            }
+            else if (_tokenService.IsValidRefreshToken(userName, ref_token))
+            {
+                var user = await _userManager.FindByNameAsync(req.userName);
+                var userRoles = await _userManager.GetRolesAsync(user);
+
+                tokenResponse = new TokenResponseModel()
+                {
+                    JWTToken = _tokenService.GetJWTToken(userRoles, user),
+                    RefreshToken = _tokenService.GetRefreshToken(user)
+                };
+
+            }
+            else
+            {
+                tokenResponse.RefreshToken.Token = "expired";
+                tokenResponse.JWTToken.Token = "expired";
+            }
+
+            return Ok(tokenResponse);
+        }
+
+        [HttpPost]
         [Route("refresh-token")]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest req)
         {

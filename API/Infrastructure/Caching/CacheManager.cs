@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Caching.Distributed;
+﻿using API.Services;
+using Microsoft.Extensions.Caching.Distributed;
 using System.Text;
 using System.Text.Json;
 
@@ -8,24 +9,23 @@ namespace API.Infrastructure.Caching
     public class CacheManager : ICacheManager
     {
         IDistributedCache cache;
-        IHttpContextAccessor accessor;
+        ISessionService sessionService;
         DistributedCacheEntryOptions options;
         ILogger<CacheManager> logger;
 
-        public CacheManager(IDistributedCache cache, IHttpContextAccessor accessor, ILogger<CacheManager> logger)
+        public CacheManager(IDistributedCache cache, ISessionService sessionService, ILogger<CacheManager> logger)
         {
             this.cache = cache;
             options = new DistributedCacheEntryOptions() { AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(20) };
-            this.accessor = accessor;
             this.logger = logger;
+            this.sessionService = sessionService;
         }
 
         public async Task<bool> TrySetAsync<T>(string key, T entry)
         {
             try
             {
-                var session = accessor.HttpContext?.Session;
-                var user = session?.GetString("user");
+                var user = sessionService?.GetString("user");
                 string json = JsonSerializer.Serialize(entry);
                 await cache.SetStringAsync(user + "-" + key,json,options);
                 return true;
@@ -41,8 +41,7 @@ namespace API.Infrastructure.Caching
         {
             try
             {
-                var session = accessor.HttpContext?.Session;
-                var user = session?.GetString("user");
+                var user = sessionService?.GetString("user");
                 var json = await cache.GetStringAsync(user + "-" + key);
                 if(json != null)
                     return JsonSerializer.Deserialize<T>(json);

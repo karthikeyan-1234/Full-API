@@ -16,7 +16,7 @@ namespace API.Repositories
             table = db.Set<T>();
         }
 
-        public async Task<EntityEntry> AddAsync(T entry) => await table.AddAsync(entry);
+        public async Task<T> AddAsync(T entry) { var res = await table.AddAsync(entry); return res.Entity; }
         public void Delete(T entry) => db.Entry(entry).State = EntityState.Deleted;
         public void Update(T entry) => db.Entry(entry).State = EntityState.Modified;
         public async Task<int> SaveChangesAsync() => await db.SaveChangesAsync();
