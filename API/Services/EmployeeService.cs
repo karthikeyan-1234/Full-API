@@ -21,16 +21,15 @@ namespace API.Services
         ILogger<EmployeeService> logger;
         IHttpContextAccessor accessor;
         string? user;
+        ISessionService sessionService;
 
-        public EmployeeService(IGenericRepo<Employee> repo, IMapper mapper, ICacheManager cache, ILogger<EmployeeService> logger, IHttpContextAccessor accessor, ICityService cityService)
+        public EmployeeService(IGenericRepo<Employee> repo, IMapper mapper, ICacheManager cache, ILogger<EmployeeService> logger, ISessionService sessionService, ICityService cityService)
         {
             this.repo = repo;
             this.mapper = mapper;
             this.cache = cache;
             this.logger = logger;
-            this.accessor = accessor;
-            var session = accessor?.HttpContext?.Session;
-            user = session?.GetString("user");
+            this.sessionService = sessionService;
             this.cityService = cityService;
         }
 
@@ -41,8 +40,7 @@ namespace API.Services
             try
             {
                 EmployeeDTO newEmp = mapper.Map<EmployeeDTO>(nEmp);
-                var session = accessor?.HttpContext?.Session;
-                user = session?.GetString("user");
+                user = sessionService.GetString("user");
 
                 var newEm = mapper.Map<Employee>(newEmp);
                 newEm.city_id = cityService.GetCityByName(nEmp?.city_name).id;
@@ -54,7 +52,7 @@ namespace API.Services
                 response.StatusCode = StatusCodes.Status201Created;
                 response.Status = "Added";
                 response.Message = "Employee added";
-                response.Object = mapper.Map<EmployeeDTO>(emp.Entity);
+                response.Object = mapper.Map<EmployeeDTO>(emp);
                 return response;
             }
             catch (Exception ex)
@@ -68,25 +66,29 @@ namespace API.Services
             }
         }
 
-        public async Task<IList<EmployeeViewModel>> GetAllEmployeesAsync()
+        public async Task<ResponseModel> GetAllEmployeesAsync()
         {
-
+            ResponseModel response = new ResponseModel();
 
             IList<Employee> employees = await cache?.TryGetAsync<IList<Employee>>("GetAllEmployees");
+            response.StatusCode = StatusCodes.Status304NotModified;
 
 
             if (employees == null)
             {
                 IEnumerable<Employee> _employees = repo.GetAllWithProperty(e => e.City_obj);
-                employees = (IList<Employee>) mapper.Map<IEnumerable<Employee>>(_employees);
+                employees = (IList<Employee>)mapper.Map<IEnumerable<Employee>>(_employees);
                 await cache.TrySetAsync("GetAllEmployees", employees);
+                response.StatusCode = StatusCodes.Status200OK;
             }
 
             var emps = (IList<EmployeeViewModel>)mapper.Map<IEnumerable<EmployeeViewModel>>(employees);
+            response.Object = emps;
+            response.Message = "All employees requested by user";
 
             logger.LogInformation("All employees requested by user {0}", user);
 
-            return emps;
+            return response;
         }
 
         public async Task<IList<EmployeeDTO>> GetAllEmployeesWithoutCacheAsync()

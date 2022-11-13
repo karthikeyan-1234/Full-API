@@ -7,7 +7,7 @@ namespace API.Services
     public interface IEmployeeService
     {
         Task<ResponseModel> AddEmployeeAsync(EmployeeViewModel newEmp);
-        Task<IList<EmployeeViewModel>> GetAllEmployeesAsync();
+        Task<ResponseModel> GetAllEmployeesAsync();
         Task<IList<EmployeeDTO>> GetAllEmployeesWithoutCacheAsync();
         Task<ResponseModel> UpdateEmployeeAsync(EmployeeViewModel nEmp);
         Task<ResponseModel> DeleteEmployeeAsync(EmployeeViewModel emp);
