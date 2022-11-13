@@ -1,9 +1,11 @@
-﻿using API.Models.DTOs;
+﻿using API.Models;
+using API.Models.DTOs;
 using API.Models.ViewModels;
 using API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using System.Collections.Generic;
 
 #pragma warning disable CS8604 // Possible null reference argument.
 
@@ -12,11 +14,11 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = "JWTBearer", Roles = "User")]
     public class EmployeeController : ControllerBase
     {
         private IEmployeeService service;
         IStringLocalizer<EmployeeController> localizer;
-
 
         public EmployeeController(IEmployeeService service,IStringLocalizer<EmployeeController> localizer)
         {
@@ -24,32 +26,50 @@ namespace API.Controllers
             this.localizer = localizer;
         }
 
-        [Authorize(AuthenticationSchemes = "JWTBearer",Roles = "User")]
         [HttpGet("GetAllEmployees",Name = "GetAllEmployees")]
         public async Task<IActionResult> GetAllEmployees()
         {
-            IList<EmployeeViewModel> employeeDTOs = await service.GetAllEmployeesAsync();
+            ResponseModel response = await service.GetAllEmployeesAsync();
+            IList<EmployeeViewModel>? employeeDTOs = null;
 
-            for (int i = 0; i < employeeDTOs.Count; i++)
+            if (response.Object != null)
             {
-                employeeDTOs[i].name = localizer[employeeDTOs[i]?.name].Value;
+                employeeDTOs = (IList<EmployeeViewModel>)response.Object;
+
+                for (int i = 0; i < employeeDTOs.Count; i++)
+                {
+                    employeeDTOs[i].name = localizer[employeeDTOs[i]?.name].Value;
+                }
             }
 
-            return StatusCode(StatusCodes.Status200OK,employeeDTOs);
+            return StatusCode(response.StatusCode,employeeDTOs);
+        }
+        [HttpGet("GetEmployeeById", Name = "GetEmployeeById")]
+        public IActionResult GetEmployeeById(int id)
+        {
+            var response = service.GetEmployeeById(id);
+            return StatusCode(response.StatusCode, response.Object);
         }
 
-        [Authorize(AuthenticationSchemes = "JWTBearer", Roles = "User")]
         [HttpPost("AddEmployee",Name = "AddEmployee")]
         public async Task<IActionResult> AddEmployee(EmployeeViewModel newEmp)
         {
-            var emp = await service.AddEmployeeAsync(newEmp);
-            return StatusCode(StatusCodes.Status200OK,emp);
+            var response = await service.AddEmployeeAsync(newEmp);
+            return StatusCode(response.StatusCode,response.Object);
         }
 
-        [HttpGet("Test",Name = "Test")]
-        public IActionResult GetTest()
+        [HttpPut("UpdateEmployee", Name = "UpdateEmployee")]
+        public async Task<IActionResult> UpdateEmployee(EmployeeViewModel newEmp)
         {
-            return Ok("Test");
+            var response = await service.UpdateEmployeeAsync(newEmp);
+            return StatusCode(response.StatusCode, response);
+        }
+
+        [HttpDelete("DeleteEmployee", Name = "DeleteEmployee")]
+        public async Task<IActionResult> DeleteEmployee(EmployeeViewModel newEmp)
+        {
+            var response = await service.DeleteEmployeeAsync(newEmp);
+            return StatusCode(response.StatusCode, response.Status);
         }
     }
 }

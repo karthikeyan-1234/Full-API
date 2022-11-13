@@ -1,10 +1,12 @@
 using API.Contexts;
 using API.Infrastructure.BackGroundTasks;
 using API.Infrastructure.Caching;
+using API.Infrastructure.Filters;
 using API.Infrastructure.Hubs;
 using API.Infrastructure.Middlewares;
 using API.Repositories;
 using API.Services;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Identity;
@@ -35,6 +37,9 @@ builder.Services.AddScoped(typeof(IGenericRepo<>), typeof(GenericRepo<>));
 builder.Services.AddScoped<ICacheManager, CacheManager>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<ICityService, CityService>();
+builder.Services.AddScoped<ISessionService, SessionService>();
+builder.Services.AddScoped<CustomSessionFilter>();
+builder.Services.AddMediatR(typeof(Program));
 //builder.Services.AddHostedService<APIBackGroundService>();
 
 builder.Services.AddLocalization(opt => { opt.ResourcesPath = "Resources"; });
@@ -74,7 +79,21 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         ValidateAudience = false,
         ValidateLifetime = true
     };
-    opt.Events = new JwtBearerEvents { OnTokenValidated = OnTokenValidated };
+    opt.Events = new JwtBearerEvents { OnTokenValidated = OnTokenValidated,
+        OnMessageReceived = context =>
+        {
+            var accessToken = context.Request.Query["access_token"];
+
+            // If the request is for our hub...
+            var path = context.HttpContext.Request.Path;
+            if (!string.IsNullOrEmpty(accessToken) && (path.StartsWithSegments("/MessageHub")))
+            {
+                // Read the token out of the query string
+                context.Token = accessToken;
+            }
+            return Task.CompletedTask;
+        }
+    };
 });
 
 static Task OnTokenValidated(TokenValidatedContext context)
