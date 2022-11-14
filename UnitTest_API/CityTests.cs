@@ -8,6 +8,7 @@ using API.Repositories;
 using API.Services;
 using AutoMapper;
 using Castle.Core.Logging;
+using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
@@ -86,12 +87,22 @@ namespace UnitTest_API
         }
 
         [Fact]
-        void Should_Session_Service_Return_Session_Data()
+        void Should_Add_City()
         {
-            var mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
-            var context = new DefaultHttpContext();
-        }
+            CityDTO newCity = new CityDTO()
+            {
+                id = 3,
+                name = "DummyCity",
+                TenantId = "1"
+            };
 
+            Task<ResponseModel> res = cityService.AddCityAsync(newCity);
+
+            Assert.Equivalent(newCity, res.Result.Object);
+            res.Result.Object.Should().BeOfType<CityDTO>();
+            var city = res.Result.Object as CityDTO;
+            city.id.Should().Be(3);
+        }
 
     }
 

@@ -19,7 +19,6 @@ namespace API.Services
         IMapper mapper;
         ICacheManager cache;
         ILogger<EmployeeService> logger;
-        IHttpContextAccessor accessor;
         string? user;
         ISessionService sessionService;
 
@@ -129,8 +128,7 @@ namespace API.Services
             try
             {
                 EmployeeDTO newEmp = mapper.Map<EmployeeDTO>(nEmp);
-                var session = accessor?.HttpContext?.Session;
-                user = session?.GetString("user");
+                user = sessionService?.GetString("user");
                 var newEm = mapper.Map<Employee>(newEmp);
                 newEm.city_id = cityService.GetCityByName(nEmp?.city_name).id;
                 var emps = repo.Find(e => e.id == newEm.id);
@@ -167,8 +165,7 @@ namespace API.Services
 
         public async Task<ResponseModel> DeleteEmployeeAsync(EmployeeViewModel emp)
         {
-            var session = accessor?.HttpContext?.Session;
-            user = session?.GetString("user");
+            user = sessionService?.GetString("user");
 
             var _emp = mapper.Map<Employee>(emp);
             var result = repo.Find(e => e.id == _emp.id);
