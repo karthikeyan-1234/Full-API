@@ -40,10 +40,6 @@ namespace UnitTest_API
 
 
         Mock<IGenericRepo<City>> mockCityRepo = new Mock<IGenericRepo<City>>();
-        MapperConfiguration mapper_config = new MapperConfiguration(cfg =>
-        {
-            cfg.AddProfile(new Mapping());
-        });
         ICityService cityService;
         ICacheManager cacheManager;
         IMapper mapper;
@@ -54,6 +50,8 @@ namespace UnitTest_API
 
         public CityTests()
         {
+            //Repo setup
+
             mockCityRepo.Setup(x => x.GetAllAsync()).ReturnsAsync(Cities);
             mockCityRepo.Setup(x => x.AddAsync(It.IsAny<City>())).ReturnsAsync((City C) =>
             {
@@ -62,18 +60,40 @@ namespace UnitTest_API
                 return C;   
             });
 
+            //Auto Mapper setup
+
+            MapperConfiguration mapper_config = new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile(new Mapping());
+            });
             mapper = mapper_config.CreateMapper();
+
+
+            //Logger setup
+
             logger = new NullLogger<CacheManager>();
             cityLogger = new NullLogger<CityService>();
+
+
+            //Session setup
 
             mockSessionService = new Mock<ISessionService>();
             mockSessionService.Setup(s => s.GetString("user")).Returns("Arjun");
 
+
+            //Mediator setup
+
             mockMediator = new Mock<IMediator>();
             mockMediator.Setup(x => x.Send(It.IsAny<GetAllCitiesQuery>(),default)).Returns(Task.FromResult(CityDTOs));
 
+
+            //Cache setup
+
             Mock<IDistributedCache> mockCache = new Mock<IDistributedCache>();
             cacheManager = new CacheManager(mockCache.Object, mockSessionService.Object, logger);
+
+
+            //Initialize services
 
             cityService = new CityService(mockCityRepo.Object, mapper, cityLogger, cacheManager, mockMediator.Object,mockSessionService.Object);
 

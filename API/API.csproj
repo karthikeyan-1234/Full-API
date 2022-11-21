@@ -28,7 +28,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="DAL\Commands\" />
     <Folder Include="Migrations\" />
   </ItemGroup>
 

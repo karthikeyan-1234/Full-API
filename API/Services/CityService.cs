@@ -1,4 +1,5 @@
-﻿using API.DAL.Queries;
+﻿using API.DAL.Commands;
+using API.DAL.Queries;
 using API.Infrastructure.Caching;
 using API.Models;
 using API.Models.DTOs;
@@ -69,8 +70,10 @@ namespace API.Services
         {
             try
             {
-                repo.Update(mapper.Map<City>(City));
-                await repo.SaveChangesAsync();
+                await mediator.Send(new UpdateCityCommand(mapper.Map<City>(City)));
+
+                //repo.Update(mapper.Map<City>(City));
+                //await repo.SaveChangesAsync();
                 logger.LogInformation("City {0} deleted by {1}", City.name, user);
                 return new ResponseModel()
                 {
