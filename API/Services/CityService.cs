@@ -1,4 +1,6 @@
 ﻿using API.DAL.Commands;
+using API.DAL.Handlers.Loggers;
+using API.DAL.Notifications;
 using API.DAL.Queries;
 using API.Infrastructure.Caching;
 using API.Models;
@@ -8,6 +10,7 @@ using API.Repositories;
 using AutoMapper;
 using MediatR;
 using System.Reflection.Metadata.Ecma335;
+using System.Xml.Linq;
 
 #pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
@@ -47,7 +50,9 @@ namespace API.Services
 
                 var emp = await repo.AddAsync(newCi);
                 await repo.SaveChangesAsync();
-                logger.LogInformation("City {0} added by {1}", newCi.name, user);
+
+                string msg = $"City {{{newCi.name}}} added by {{{user}}}";
+                await mediator.Publish(new LoggerNotification(msg));
 
                 response.StatusCode = StatusCodes.Status201Created;
                 response.Status = "Added";
@@ -71,10 +76,10 @@ namespace API.Services
             try
             {
                 await mediator.Send(new UpdateCityCommand(mapper.Map<City>(City)));
+                string msg = $"City {{{City.name}}} updated by {{{user}}}";
 
-                //repo.Update(mapper.Map<City>(City));
-                //await repo.SaveChangesAsync();
-                logger.LogInformation("City {0} deleted by {1}", City.name, user);
+                await mediator.Publish(new LoggerNotification(msg));
+
                 return new ResponseModel()
                 {
                     StatusCode = StatusCodes.Status200OK,
@@ -101,6 +106,12 @@ namespace API.Services
             {
                 repo.Delete(mapper.Map<City>(City));
                 await repo.SaveChangesAsync();
+
+                string msg = $"City {{{City.name}}} deleted by {{{user}}}";
+
+                await mediator.Publish(new LoggerNotification(msg));
+
+
                 return new ResponseModel()
                 {
                     StatusCode = StatusCodes.Status200OK,
@@ -136,7 +147,9 @@ namespace API.Services
                 await cache.TrySetAsync("GetAllCities", cities);
             }
 
-            logger.LogInformation("All cities requested by user {0}", user);
+            string msg = $"All cities requested by {{{user}}}";
+
+            await mediator.Publish(new LoggerNotification(msg));
             return cities;
         }
 

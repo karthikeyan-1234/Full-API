@@ -4,7 +4,7 @@ using API.Models.DTOs;
 using API.Repositories;
 using MediatR;
 
-namespace API.DAL.Handlers
+namespace API.DAL.Handlers.Cities
 {
     public class UpdateCityCommandHandler : IRequestHandler<UpdateCityCommand, City>
     {

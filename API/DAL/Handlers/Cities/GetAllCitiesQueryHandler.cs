@@ -5,14 +5,14 @@ using API.Repositories;
 using AutoMapper;
 using MediatR;
 
-namespace API.DAL.Handlers
+namespace API.DAL.Handlers.Cities
 {
     public class GetAllCitiesQueryHandler : IRequestHandler<GetAllCitiesQuery, IList<CityDTO>>
     {
         IGenericRepo<City> repo;
         IMapper mapper;
 
-        public GetAllCitiesQueryHandler(IGenericRepo<City> repo,IMapper mapper)
+        public GetAllCitiesQueryHandler(IGenericRepo<City> repo, IMapper mapper)
         {
             this.repo = repo;
             this.mapper = mapper;
